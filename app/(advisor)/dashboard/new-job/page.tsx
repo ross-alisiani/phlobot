@@ -9,7 +9,7 @@ type SchedulingType = "exact" | "window" | "multiple" | "any_weekday" | "any_wee
 interface WindowOption {
   date: string;
   start: string;
-  end: string;
+  end: string
 }
 
 export default function NewJobPage() {
