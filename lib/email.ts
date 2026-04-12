@@ -20,6 +20,7 @@ export async function sendConnectionEmail(params: { advisorName: string; advisor
     await resend.emails.send({ from: `${FROM_NAME} <${FROM_EMAIL}>`, to: [advisorEmail, examinerEmail], subject, html });
     return true;
   } catch (err) { console.error("[email]", err); return false; }
+}
 
 
 export async function sendUnfilledEmail(params: { advisorName: string; advisorEmail: string; jobDetails: { age: number; gender: string; zip: string; examType: string; jobId: string; }; dashboardUrl: string; }): Promise<boolean> {
