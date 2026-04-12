@@ -6,3 +6,4 @@
     }
   ]
 }
+{ "crons": [ { "path": "/api/cron/check-unfilled", "schedule": "0 9 * * *" } ] }
