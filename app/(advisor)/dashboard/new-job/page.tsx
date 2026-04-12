@@ -9,7 +9,7 @@ type SchedulingType = "exact" | "window" | "multiple" | "any_weekday" | "any_wee
 interface WindowOption {
   date: string;
   start: string;
-  end: string
+  end: strin
 }
 
 export default function NewJobPage() {
@@ -296,7 +296,7 @@ export default function NewJobPage() {
                         <input type="time" className="input" value={w.end}
                           onChange={e => updateWindow(i, "end", e.target.value)} />
                       </div>
-                      {-ultipleWindows.length > 1 && (
+                      {multipleWindows.length > 1 && (
                         <button type="button" onClick={() => removeWindow(i)}
                           className="text-red-400 hover:text-red-600 pb-2.5 text-lg">✕</button>
                       )}
