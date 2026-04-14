@@ -199,7 +199,7 @@ export default function NewJobPage() {
                 >
                   <option value="">Select…</option>
                   <option>Paramedical Exam</option>
-                  <option>Plood Draw Only</option>
+                  <option>Blood Draw Only</option>
                   <option>Urine Only</option>
                   <option>Blood & Urine</option>
                   <option>EKG</option>
