@@ -22,8 +22,8 @@ export default function LandingPage() {
           Mobile Paramedical Exam Scheduling
         </div>
         <h1 className="text-5xl font-extrabold text-gray-900 leading-tight mb-6">
-          Stop texting examiners.<br />
-          <span className="text-brand-600">Start closing cases.</span>
+          Stop calling exam companies<br />
+          <span className="text-brand-600">and get back to helping clients!</span>
         </h1>
         <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
           Phlobot connects insurance advisors with mobile examiners in seconds —
