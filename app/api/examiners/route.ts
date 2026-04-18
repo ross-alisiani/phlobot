@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { zipToLatLng } from "@/lib/geocoding";
-import { formatPhone } from "@/lib/twilio";
+import { parseAndValidatePhone } from "@/lib/twilio";
 
 // POST — add a new examiner (public signup or admin entry)
 export async function POST(request: Request) {
@@ -13,6 +13,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Validate and normalize phone to E.164 — reject if not a real US number
+    const e164Phone = parseAndValidatePhone(phone);
+    if (!e164Phone) {
+      return NextResponse.json(
+        { error: "Please enter a valid US mobile phone number (e.g. (720) 555-0100)." },
+        { status: 400 }
+      );
+    }
+
     // Geocode the zip
     const coords = await zipToLatLng(zip_code);
 
@@ -22,7 +31,7 @@ export async function POST(request: Request) {
     const { data: existing } = await admin
       .from("examiners")
       .select("id")
-      .eq("phone", formatPhone(phone))
+      .eq("phone", e164Phone)
       .maybeSingle();
 
     if (existing) {
@@ -37,7 +46,7 @@ export async function POST(request: Request) {
       .insert({
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        phone: formatPhone(phone),
+        phone: e164Phone,
         zip_code: zip_code.trim(),
         lat: coords?.lat ?? null,
         lng: coords?.lng ?? null,
