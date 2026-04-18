@@ -3,6 +3,7 @@
 // ============================================================
 
 import twilio from "twilio";
+import { parsePhoneNumber } from "libphonenumber-js";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -25,9 +26,30 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
 }
 
 /**
- * Format a phone number to E.164 format (+1XXXXXXXXXX).
+ * Parse and validate a phone number, returning E.164 format (+1XXXXXXXXXX for US)
+ * or null if the number is not a valid, dialable phone number.
+ * Defaults to US country if no country code is present.
+ */
+export function parseAndValidatePhone(phone: string): string | null {
+  try {
+    const parsed = parsePhoneNumber(phone, "US");
+    if (parsed && parsed.isValid()) {
+      return parsed.format("E.164");
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Format a phone number to E.164. Uses libphonenumber-js for proper validation,
+ * falls back to digit-stripping for already-E.164 inputs (e.g. from Twilio webhooks).
  */
 export function formatPhone(phone: string): string {
+  const validated = parseAndValidatePhone(phone);
+  if (validated) return validated;
+  // Fallback for webhook inputs that arrive as +1XXXXXXXXXX already
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
