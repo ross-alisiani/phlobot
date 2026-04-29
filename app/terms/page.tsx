@@ -1,148 +1,154 @@
+import Link from "next/link";
+
+export const metadata = {
+  title: "Terms and Conditions | Phlobot",
+  description: "Phlobot Terms and Conditions — rules governing use of our service and SMS program.",
+};
+
 export default function TermsPage() {
   return (
-    <main className="max-w-3xl mx-auto px-6 py-12 text-gray-800">
-      <h1 className="text-3xl font-bold mb-2">Terms and Conditions</h1>
-      <p className="text-sm text-gray-500 mb-8">Last updated: April 17, 2026</p>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="border-b border-gray-100 px-6 py-4">
+        <Link href="/" className="text-xl font-bold text-brand-700">
+          🩺 Phlobot
+        </Link>
+      </header>
 
-      <p className="mb-6">
-        Please read these Terms and Conditions carefully before using Phlobot
-        (the Platform), operated by Phlowbot LLC (we, us, or our). By accessing
-        or using Phlobot, you agree to be bound by these Terms.
-      </p>
+      {/* Content */}
+      <main className="mx-auto max-w-3xl px-6 py-12">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms and Conditions</h1>
+        <p className="text-sm text-gray-400 mb-10">Effective date: April 28, 2026</p>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">1. Description of Service</h2>
-        <p>
-          Phlobot is an online platform that connects independent life insurance
-          advisors with licensed mobile medical examiners. Advisors submit exam
-          requests; examiners receive SMS notifications and may claim available
-          jobs through the Platform.
-        </p>
-      </section>
+        <div className="space-y-8">
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">2. Eligibility</h2>
-        <p>
-          To use Phlobot you must be at least 18 years old and, where applicable,
-          hold any professional licenses required to perform your role. By
-          registering you represent that all information you provide is accurate.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">1. Overview</h2>
+            <p className="text-gray-600 leading-relaxed">
+              These Terms and Conditions (&ldquo;Terms&rdquo;) govern your use of Phlobot&apos;s platform and SMS notification program. By registering on our website at phlobot.com or opting in to receive SMS messages, you agree to these Terms. If you do not agree, do not use our service.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">3. SMS Notifications and Messaging</h2>
-        <p className="mb-3">
-          By completing the examiner sign-up form you expressly consent to receive
-          recurring automated SMS text messages from Phlobot at the mobile number
-          you provide. These messages may include new exam job alerts, job status
-          updates, appointment confirmations, and platform notices.
-        </p>
-        <p className="mb-3">
-          Message frequency varies based on job availability. Standard message and
-          data rates may apply. To opt out at any time, reply STOP to any message.
-          To request help, reply HELP or contact us at support@phlobot.com.
-        </p>
-        <p>
-          Opting out will stop all job-related SMS notifications. You may still
-          access the Platform through your account portal.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">2. Description of Service</h2>
+            <p className="text-gray-600 leading-relaxed">
+              Phlobot is a platform that connects life insurance advisors with independent mobile medical examiners. When an advisor submits an exam request, Phlobot notifies nearby registered examiners via SMS. Examiners can claim available jobs, coordinate with advisors, and complete medical exams for life insurance applications.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">4. User Accounts</h2>
-        <p>
-          You are responsible for maintaining the confidentiality of your account
-          credentials and for all activity that occurs under your account. Notify
-          us immediately at support@phlobot.com if you suspect unauthorized use.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">3. SMS Messaging Program</h2>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">5. Acceptable Use</h2>
-        <p className="mb-3">You agree not to:</p>
-        <ul className="list-disc pl-6 space-y-2">
-          <li>Provide false or misleading information during registration or job fulfillment.</li>
-          <li>Use the Platform for any unlawful purpose or in violation of applicable regulations.</li>
-          <li>Interfere with or disrupt the integrity or performance of the Platform.</li>
-          <li>Attempt to gain unauthorized access to any part of the Platform.</li>
-          <li>Resell or sublicense access to the Platform without our prior written consent.</li>
-        </ul>
-      </section>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+              <p className="text-sm font-semibold text-gray-700 mb-2">Phlobot Examiner Alerts — Program Summary</p>
+              <ul className="text-sm text-gray-600 space-y-1.5">
+                <li><strong>Program name:</strong> Phlobot Examiner Alerts</li>
+                <li><strong>Description:</strong> Recurring automated SMS notifications for available medical exam jobs near your service area</li>
+                <li><strong>Message frequency:</strong> Varies — messages are sent when exam jobs become available in your area. You may receive multiple messages per day during busy periods, or none during slow periods.</li>
+                <li><strong>Message and data rates may apply</strong></li>
+                <li>To opt out: Reply <strong>STOP</strong> to any message. You will receive a confirmation and no further messages will be sent.</li>
+                <li>To get help: Reply <strong>HELP</strong> or email <a href="mailto:help@phlobot.com" className="text-brand-600 underline">help@phlobot.com</a></li>
+                <li><strong>Supported carriers:</strong> Most US carriers. Carriers are not liable for delayed or undelivered messages.</li>
+              </ul>
+            </div>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">6. Independent Contractors</h2>
-        <p>
-          Examiners who use Phlobot are independent contractors and not employees,
-          agents, or partners of Phlowbot LLC or of any advisor using the Platform.
-          Phlobot does not guarantee the availability of jobs or the suitability of
-          any examiner for a particular engagement.
-        </p>
-      </section>
+            <p className="text-gray-600 leading-relaxed mb-3">
+              By providing your mobile phone number and checking the consent checkbox on our examiner sign-up form at{" "}
+              <a href="https://phlobot.com/examiner-signup" className="text-brand-600 underline">phlobot.com/examiner-signup</a>,
+              you expressly consent to receive recurring automated SMS messages from Phlobot at the number provided. Consent is not a condition of any purchase or service.
+            </p>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">7. Privacy</h2>
-        <p>
-          Your use of the Platform is also governed by our Privacy Policy,
-          which is incorporated into these Terms by reference.
-        </p>
-      </section>
+            <p className="text-gray-600 leading-relaxed">
+              SMS messages are delivered through Twilio, our messaging service provider. Phlobot is solely responsible for the content of messages sent through its program.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">8. Intellectual Property</h2>
-        <p>
-          All content, trademarks, logos, and software associated with Phlobot are
-          the property of Phlowbot LLC or its licensors. You may not copy,
-          reproduce, or distribute any part of the Platform without our express
-          written permission.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">4. Eligibility</h2>
+            <p className="text-gray-600 leading-relaxed">
+              You must be at least 18 years of age and a resident of the United States to use Phlobot&apos;s services. By registering, you represent and warrant that you meet these requirements. You must provide a valid US mobile phone number capable of receiving SMS messages.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">9. Disclaimer of Warranties</h2>
-        <p>
-          The Platform is provided as-is and as-available without warranties of any
-          kind, express or implied. We do not warrant that the Platform will be
-          uninterrupted, error-free, or free of harmful components.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">5. User Responsibilities</h2>
+            <p className="text-gray-600 leading-relaxed mb-3">By using Phlobot, you agree to:</p>
+            <ul className="list-disc pl-5 space-y-1 text-gray-600">
+              <li>Provide accurate and truthful registration information</li>
+              <li>Maintain a valid US mobile phone number on your account</li>
+              <li>Conduct yourself professionally when coordinating with advisors and clients</li>
+              <li>Not share your account credentials with others</li>
+              <li>Notify us promptly if your contact information changes</li>
+            </ul>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">10. Limitation of Liability</h2>
-        <p>
-          To the fullest extent permitted by law, Phlowbot LLC shall not be liable
-          for any indirect, incidental, special, consequential, or punitive damages
-          arising out of or related to your use of the Platform.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">6. Job Claims and Commitments</h2>
+            <p className="text-gray-600 leading-relaxed">
+              When you reply YES to a job offer SMS, you are committing to complete that medical examination. Phlobot will connect you with the requesting advisor via email. Repeated no-shows or failures to complete claimed jobs may result in suspension or removal from the platform.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">11. Modifications</h2>
-        <p>
-          We reserve the right to modify these Terms at any time. We will notify
-          registered users of material changes via email or an in-platform notice.
-          Continued use of the Platform after changes take effect constitutes
-          acceptance of the revised Terms.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">7. Intellectual Property</h2>
+            <p className="text-gray-600 leading-relaxed">
+              All content, branding, and software on phlobot.com is owned by Phlobot and protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written consent.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">12. Governing Law</h2>
-        <p>
-          These Terms are governed by the laws of the State of Colorado, without
-          regard to its conflict of law provisions. Any disputes shall be resolved
-          in the state or federal courts located in Denver, Colorado.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">8. Disclaimer of Warranties</h2>
+            <p className="text-gray-600 leading-relaxed">
+              Phlobot is provided &ldquo;as is&rdquo; without warranties of any kind, express or implied. We do not guarantee continuous availability, error-free operation, or any specific volume of job opportunities. SMS delivery is subject to mobile carrier availability and network conditions.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">13. Contact Us</h2>
-        <p>If you have questions about these Terms, please contact us at:</p>
-        <address className="not-italic mt-2 text-gray-700">
-          Phlowbot LLC<br />
-          Denver, CO<br />
-          support@phlobot.com
-        </address>
-      </section>
-    </main>
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">9. Limitation of Liability</h2>
+            <p className="text-gray-600 leading-relaxed">
+              To the maximum extent permitted by law, Phlobot shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service, including but not limited to lost earnings, missed job opportunities, or SMS delivery failures.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">10. Modifications to Service and Terms</h2>
+            <p className="text-gray-600 leading-relaxed">
+              Phlobot reserves the right to modify these Terms or discontinue the service at any time. Material changes will be communicated via email or SMS where practicable. Continued use of the service after changes constitutes acceptance of the updated Terms.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">11. Governing Law</h2>
+            <p className="text-gray-600 leading-relaxed">
+              These Terms are governed by the laws of the United States and the state of Colorado, without regard to conflict of law principles.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">12. Contact Us</h2>
+            <p className="text-gray-600 leading-relaxed">
+              If you have questions about these Terms, please contact us:
+            </p>
+            <div className="mt-3 text-gray-600 space-y-1">
+              <p><strong>Phlobot</strong></p>
+              <p>Email: <a href="mailto:help@phlobot.com" className="text-brand-600 underline">help@phlobot.com</a></p>
+              <p>Website: <a href="https://phlobot.com" className="text-brand-600 underline">phlobot.com</a></p>
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 px-6 py-6 mt-12">
+        <div className="mx-auto max-w-3xl flex flex-wrap gap-4 text-sm text-gray-400">
+          <Link href="/" className="hover:text-gray-600">Home</Link>
+          <Link href="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
+          <Link href="/terms" className="text-gray-600">Terms and Conditions</Link>
+          <Link href="/examiner-signup" className="hover:text-gray-600">Sign Up as Examiner</Link>
+        </div>
+        <p className="mt-3 text-xs text-gray-400 mx-auto max-w-3xl">© 2026 Phlobot. All rights reserved.</p>
+      </footer>
+    </div>
   );
 }
