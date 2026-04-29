@@ -15,6 +15,7 @@ export default function ExaminerSignupPage() {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", zip: "", radius: "25",
   });
+  const [smsConsent, setSmsConsent] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,11 @@ export default function ExaminerSignupPage() {
     const digits = form.phone.replace(/\D/g, "");
     if (digits.length !== 10) {
       setError("Please enter a complete 10-digit US phone number.");
+      return;
+    }
+
+    if (!smsConsent) {
+      setError("You must agree to receive SMS notifications to sign up.");
       return;
     }
 
@@ -157,22 +163,36 @@ export default function ExaminerSignupPage() {
               </div>
             </div>
 
+            {/* SMS Opt-in Consent — required for A2P compliance */}
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 flex-shrink-0"
+                  checked={smsConsent}
+                  onChange={e => setSmsConsent(e.target.checked)}
+                  required
+                />
+                <span className="text-sm text-gray-700">
+                  I agree to receive recurring automated SMS job notifications from Phlobot at the phone number provided. Message frequency varies based on job availability in my area. Message and data rates may apply. Reply <strong>STOP</strong> to unsubscribe at any time, or <strong>HELP</strong> for help. View our{" "}
+                  <Link href="/privacy" className="text-brand-600 underline">Privacy Policy</Link>{" "}
+                  and{" "}
+                  <Link href="/terms" className="text-brand-600 underline">Terms and Conditions</Link>.
+                </span>
+              </label>
+            </div>
+
             {error && (
               <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
 
-            <button type="submit" className="btn-primary w-full" disabled={loading}>
+            <button type="submit" className="btn-primary w-full" disabled={loading || !smsConsent}>
               {loading ? "Signing up…" : "Sign Me Up →"}
             </button>
           </form>
         </div>
-
-        <p className="text-center text-xs text-gray-400 mt-4">
-          By signing up, you agree to receive SMS messages from Phlobot.
-          Reply STOP at any time to unsubscribe.
-        </p>
       </div>
     </div>
   );
