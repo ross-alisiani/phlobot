@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { findExaminersForZip } from "@/lib/matching";
 import { sendSMS, formatPhone, smsJobOffer } from "@/lib/twilio";
 import { formatSchedulingSummary } from "@/lib/scheduling";
+import { getPlanLimit, isAtEnterpriseLimit } from "@/lib/billing";
 
 export async function POST(request: Request) {
   try {
@@ -23,6 +24,30 @@ export async function POST(request: Request) {
     if (!profile) {
       return NextResponse.json({ error: "Advisor profile not found" }, { status: 404 });
     }
+
+    // ── Billing gate ──────────────────────────────────────────────────────────
+    // jobs_this_month counts accepted jobs (incremented in SMS webhook on assignment).
+    // Free tier: lifetime cap of 3. Paid tiers: monthly cap per plan.
+    const planLimit = getPlanLimit(profile.plan_tier);
+    if (profile.jobs_this_month >= planLimit) {
+      if (isAtEnterpriseLimit(profile.plan_tier, profile.jobs_this_month)) {
+        return NextResponse.json(
+          { error: "ENTERPRISE_LIMIT", message: "You've reached the 50-exam Pro limit. Contact us for enterprise pricing." },
+          { status: 402 }
+        );
+      }
+      if (profile.plan_tier === "free") {
+        return NextResponse.json(
+          { error: "PAYWALL", message: "Your free trial of 3 accepted exams is complete. Please upgrade to continue." },
+          { status: 402 }
+        );
+      }
+      return NextResponse.json(
+        { error: "PLAN_LIMIT", message: `You've reached your ${planLimit}-exam monthly limit. Upgrade your plan to continue.` },
+        { status: 402 }
+      );
+    }
+    // ── End billing gate ──────────────────────────────────────────────────────
 
     const body = await request.json();
     const {
@@ -64,17 +89,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to create job" }, { status: 500 });
     }
 
-    // Increment advisor's monthly count
-    await admin
-      .from("advisor_profiles")
-      .update({ jobs_this_month: profile.jobs_this_month + 1 })
-      .eq("id", profile.id);
+    // NOTE: jobs_this_month is incremented in the SMS webhook when an examiner
+    // accepts the job (status → assigned). We do NOT increment on request creation.
 
     // Find matching examiners
     const matches = await findExaminersForZip(patient_zip);
 
     if (matches.length === 0) {
-      // No examiners found — mark as needing attention
       await admin
         .from("job_requests")
         .update({ status: "broadcast", broadcast_at: new Date().toISOString() })
