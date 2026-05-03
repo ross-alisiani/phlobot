@@ -5,21 +5,21 @@
 export type UserRole = "advisor" | "admin";
 
 export type JobStatus =
-  | "pending"       // just created, not yet broadcast
-  | "broadcast"     // SMS sent to examiners, waiting for response
-  | "assigned"      // examiner accepted
-  | "completed"     // exam done
-  | "canceled"      // canceled by advisor or admin
-  | "unfilled";     // 24h passed with no acceptance
+  | "pending"
+  | "broadcast"
+  | "assigned"
+  | "completed"
+  | "canceled"
+  | "unfilled";
 
 export type SchedulingType = "exact" | "window" | "multiple" | "any_weekday" | "any_weekend";
 
 export interface SchedulingOption {
   type?: "any_weekday" | "any_weekend";
-  date?: string;       // "YYYY-MM-DD"
-  time?: string;       // "HH:MM" (exact only)
-  start?: string;      // "HH:MM" (window)
-  end?: string;        // "HH:MM" (window)
+  date?: string;
+  time?: string;
+  start?: string;
+  end?: string;
 }
 
 export interface AdvisorProfile {
@@ -29,9 +29,12 @@ export interface AdvisorProfile {
   company_name?: string;
   phone?: string;
   email: string;
-  plan_tier: string;
-  jobs_this_month: number;
+  plan_tier: string;                  // 'free' | 'starter' | 'growth' | 'pro'
+  jobs_this_month: number;            // count of accepted jobs this billing cycle
   billing_cycle_start: string;
+  billing_status?: string;            // 'free' | 'active' | 'past_due' | 'cancelled'
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
   created_at: string;
 }
 
@@ -67,7 +70,6 @@ export interface JobRequest {
   unfilled_notified_at?: string;
   notes?: string;
   created_at: string;
-  // Joined fields
   advisor?: AdvisorProfile;
   assigned_examiner?: Examiner;
 }
@@ -82,6 +84,5 @@ export interface JobOffer {
   response_position?: number;
   minutes_after_winner?: number;
   created_at: string;
-  // Joined
   examiner?: Examiner;
 }
