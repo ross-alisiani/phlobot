@@ -8,22 +8,17 @@ import { formatSchedulingSummary } from "@/lib/scheduling";
  * Twilio SMS Webhook
  *
  * Twilio calls this endpoint when an examiner replies to a job offer SMS.
- * We parse the reply (YES or NO), determine the job, and handle the logic:
- *   - First YES  → win, assign, notify both parties, send connection email
- *   - Later YES  → "too late" message with position + time difference
- *   - NO         → "thanks, passing" and mark offer declined
- *   - STOP       → mark examiner inactive in DB (opt-out)
- *   - START      → re-activate examiner (opt back in)
- *   - HELP       → send CTIA-required support info
+ * We parse the reply (YES / NO / STOP / HELP / START), handle the logic,
+ * and increment the advisor's accepted-job counter when a job is won.
  */
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const fromRaw  = formData.get("From") as string; // examiner's phone
+    const fromRaw  = formData.get("From") as string;
     const body     = (formData.get("Body") as string || "").trim().toUpperCase();
 
     if (!fromRaw) {
-      return twilioResponse(""); // Twilio requires a TwiML response
+      return twilioResponse("");
     }
 
     const from = formatPhone(fromRaw);
@@ -37,23 +32,27 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (!examiner) {
-      // Unknown number — send a generic response
-      return twilioResponse("You don't appear to be registered with Phlobot. Questions? Email help@phlobot.com");
+      return twilioResponse(
+        "You don't appear to be registered with Phlobot. Questions? Email help@phlobot.com"
+      );
     }
 
-    // Handle STOP/UNSUBSCRIBE — mark examiner inactive in DB
+    // ── Keyword handling ──────────────────────────────────────────────────────
+
     if (body === "STOP" || body === "UNSUBSCRIBE" || body === "CANCEL" || body === "QUIT") {
       await admin.from("examiners").update({ active: false }).eq("id", examiner.id);
-      return twilioResponse("You've been unsubscribed from Phlobot job alerts. No further messages will be sent. Reply START to resubscribe.");
+      return twilioResponse(
+        "You've been unsubscribed from Phlobot job alerts. No further messages will be sent. Reply START to resubscribe."
+      );
     }
 
-    // Handle START/UNSTOP — re-activate examiner
     if (body === "START" || body === "UNSTOP") {
       await admin.from("examiners").update({ active: true }).eq("id", examiner.id);
-      return twilioResponse("You've been resubscribed to Phlobot job alerts. You'll receive texts when exam jobs are available near you.");
+      return twilioResponse(
+        "You've been resubscribed to Phlobot job alerts. You'll receive texts when exam jobs are available near you."
+      );
     }
 
-    // Handle HELP — send CTIA-required support info
     if (body === "HELP") {
       return twilioResponse(
         "Phlobot Examiner Alerts: Job notifications for medical examiners. " +
@@ -62,7 +61,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find this examiner's most recent pending offer
+    // ── Find most recent pending offer ────────────────────────────────────────
+
     const { data: offer } = await admin
       .from("job_offers")
       .select("*, job_request:job_requests(*)")
@@ -73,26 +73,32 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (!offer) {
-      return twilioResponse("No active job offer found for your number. Stay tuned for the next one!");
+      return twilioResponse(
+        "No active job offer found for your number. Stay tuned for the next one!"
+      );
     }
 
     const job = offer.job_request as any;
 
-    // Handle NO response
+    // ── NO response ───────────────────────────────────────────────────────────
+
     if (body === "NO" || body === "N") {
       await admin
         .from("job_offers")
         .update({ response: "no", responded_at: new Date().toISOString() })
         .eq("id", offer.id);
 
-      return twilioResponse("Got it — passing on this one. We'll text you when the next job comes up!");
+      return twilioResponse(
+        "Got it — passing on this one. We'll text you when the next job comes up!"
+      );
     }
 
-    // Handle YES response
+    // ── YES response ──────────────────────────────────────────────────────────
+
     if (body === "YES" || body === "Y") {
       // Check if job is still open
       if (job.status !== "broadcast") {
-        // Job already taken — find position
+        // Job already taken — record late response
         const { data: winnerOffer } = await admin
           .from("job_offers")
           .select("responded_at")
@@ -102,7 +108,6 @@ export async function POST(request: Request) {
           .limit(1)
           .maybeSingle();
 
-        // Count how many YES responses came before this one
         const { count } = await admin
           .from("job_offers")
           .select("*", { count: "exact", head: true })
@@ -113,12 +118,10 @@ export async function POST(request: Request) {
         let minutesLate: number | undefined;
 
         if (winnerOffer?.responded_at) {
-          const winTime  = new Date(winnerOffer.responded_at).getTime();
-          const nowTime  = Date.now();
-          minutesLate = Math.round((nowTime - winTime) / 60000);
+          const winTime = new Date(winnerOffer.responded_at).getTime();
+          minutesLate = Math.round((Date.now() - winTime) / 60000);
         }
 
-        // Record this response
         await admin
           .from("job_offers")
           .update({
@@ -129,14 +132,14 @@ export async function POST(request: Request) {
           })
           .eq("id", offer.id);
 
-        const msg = smsJobLost(position, minutesLate);
-        return twilioResponse(msg);
+        return twilioResponse(smsJobLost(position, minutesLate));
       }
 
-      // JOB IS STILL OPEN — this examiner wins!
+      // ── JOB IS STILL OPEN — this examiner wins! ───────────────────────────
+
       const now = new Date().toISOString();
 
-      // Update the offer as winner (position 1)
+      // Mark offer as winner
       await admin
         .from("job_offers")
         .update({
@@ -157,12 +160,23 @@ export async function POST(request: Request) {
         })
         .eq("id", job.id);
 
-      // Get advisor profile for email
+      // Get advisor profile
       const { data: advisor } = await admin
         .from("advisor_profiles")
         .select("*")
         .eq("id", job.advisor_id)
         .single();
+
+      // ── Increment advisor's accepted-job counter ───────────────────────────
+      // This is the authoritative increment — only count jobs that were actually
+      // accepted by an examiner, not just requested by the advisor.
+      if (advisor) {
+        await admin
+          .from("advisor_profiles")
+          .update({ jobs_this_month: (advisor.jobs_this_month ?? 0) + 1 })
+          .eq("id", job.advisor_id);
+      }
+      // ── End counter increment ─────────────────────────────────────────────
 
       const schedulingSummary = formatSchedulingSummary(
         job.scheduling_type,
@@ -178,10 +192,10 @@ export async function POST(request: Request) {
         jobId:             job.id,
       };
 
-      // Send confirmation text to winning examiner
+      // Send confirmation SMS to winning examiner
       await sendSMS(examiner.phone, smsJobWon(jobDetails));
 
-      // Send connection email to both advisor and examiner
+      // Send connection email to both parties
       if (advisor) {
         await sendConnectionEmail({
           advisorName:   advisor.name,
@@ -192,12 +206,13 @@ export async function POST(request: Request) {
         });
       }
 
-      // Respond to Twilio (examiner already got a separate SMS above)
       return twilioResponse("");
     }
 
     // Unrecognized reply
-    return twilioResponse("Reply YES to claim the job or NO to pass. Reply HELP for support or STOP to unsubscribe.");
+    return twilioResponse(
+      "Reply YES to claim the job or NO to pass. Reply HELP for support or STOP to unsubscribe."
+    );
   } catch (err) {
     console.error("[sms/webhook] unexpected error:", err);
     return twilioResponse("Something went wrong on our end. Please try again.");
