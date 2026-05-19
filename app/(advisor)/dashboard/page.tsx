@@ -31,8 +31,9 @@ function StatusBadge({ status }: { status: string }) {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { upgraded?: string };
+  searchParams: Promise<{ upgraded?: string }>;
 }) {
+  const { upgraded } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -94,7 +95,7 @@ export default async function DashboardPage({
       <main className="max-w-5xl mx-auto px-6 py-8">
 
         {/* ── Upgrade success banner ── */}
-        {searchParams.upgraded && (
+        {upgraded && (
           <div className="bg-green-50 border border-green-200 rounded-xl px-5 py-4 mb-6 flex items-center gap-3">
             <span className="text-green-500 text-xl">✓</span>
             <div>
