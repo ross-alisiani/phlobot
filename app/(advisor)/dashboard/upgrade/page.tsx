@@ -8,8 +8,9 @@ export const metadata = { title: "Upgrade | Phlobot" };
 export default async function UpgradePage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
+  const { error } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -39,7 +40,7 @@ export default async function UpgradePage({
       <main className="max-w-4xl mx-auto px-6 py-12">
 
         {/* Error banners */}
-        {searchParams.error === "stripe_not_configured" && (
+        {error === "stripe_not_configured" && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4 mb-8 text-center">
             <p className="font-semibold text-yellow-800 mb-1">Payments coming soon</p>
             <p className="text-sm text-yellow-700">
@@ -50,7 +51,7 @@ export default async function UpgradePage({
           </div>
         )}
 
-        {searchParams.error === "server_error" && (
+        {error === "server_error" && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 mb-8 text-center">
             <p className="text-sm text-red-700">Something went wrong. Please try again or email help@phlobot.com.</p>
           </div>
