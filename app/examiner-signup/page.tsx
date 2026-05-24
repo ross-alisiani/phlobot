@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 
@@ -13,7 +12,11 @@ function formatPhoneDisplay(value: string): string {
 
 export default function ExaminerSignupPage() {
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", zip: "", radius: "25",
+    name: "",
+    email: "",
+    phone: "",
+    zip: "",
+    radius: "25",
   });
   const [smsConsent, setSmsConsent] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -31,21 +34,14 @@ export default function ExaminerSignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
     // Client-side: require exactly 10 digits
     const digits = form.phone.replace(/\D/g, "");
     if (digits.length !== 10) {
       setError("Please enter a complete 10-digit US phone number.");
       return;
     }
-
-    if (!smsConsent) {
-      setError("You must agree to receive SMS notifications to sign up.");
-      return;
-    }
-
+    // SMS consent is optional — users may sign up without it
     setLoading(true);
-
     const res = await fetch("/api/examiners", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -55,17 +51,15 @@ export default function ExaminerSignupPage() {
         phone: form.phone,
         zip_code: form.zip,
         radius_miles: parseInt(form.radius),
+        sms_consent: smsConsent,
       }),
     });
-
     const data = await res.json();
-
     if (!res.ok) {
       setError(data.error || "Something went wrong.");
       setLoading(false);
       return;
     }
-
     setSubmitted(true);
   }
 
@@ -114,14 +108,26 @@ export default function ExaminerSignupPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label">Full name *</label>
-              <input type="text" className="input" value={form.name}
-                onChange={e => update("name", e.target.value)} required placeholder="Jane Smith" />
+              <input
+                type="text"
+                className="input"
+                value={form.name}
+                onChange={e => update("name", e.target.value)}
+                required
+                placeholder="Jane Smith"
+              />
             </div>
 
             <div>
               <label className="label">Email address *</label>
-              <input type="email" className="input" value={form.email}
-                onChange={e => update("email", e.target.value)} required placeholder="jane@example.com" />
+              <input
+                type="email"
+                className="input"
+                value={form.email}
+                onChange={e => update("email", e.target.value)}
+                required
+                placeholder="jane@example.com"
+              />
               <p className="text-xs text-gray-400 mt-1">
                 Used for the advisor connection email after you win a job.
               </p>
@@ -146,14 +152,24 @@ export default function ExaminerSignupPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Your ZIP code *</label>
-                <input type="text" className="input" value={form.zip}
-                  onChange={e => update("zip", e.target.value)} required maxLength={5}
-                  pattern="\d{5}" placeholder="80202" />
+                <input
+                  type="text"
+                  className="input"
+                  value={form.zip}
+                  onChange={e => update("zip", e.target.value)}
+                  required
+                  maxLength={5}
+                  pattern="\d{5}"
+                  placeholder="80202"
+                />
               </div>
               <div>
                 <label className="label">Travel radius *</label>
-                <select className="input" value={form.radius}
-                  onChange={e => update("radius", e.target.value)}>
+                <select
+                  className="input"
+                  value={form.radius}
+                  onChange={e => update("radius", e.target.value)}
+                >
                   <option value="10">10 miles</option>
                   <option value="15">15 miles</option>
                   <option value="25">25 miles</option>
@@ -163,7 +179,7 @@ export default function ExaminerSignupPage() {
               </div>
             </div>
 
-            {/* SMS Opt-in Consent — required for A2P compliance */}
+            {/* SMS Opt-in Consent — voluntary, not required to register */}
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
@@ -171,7 +187,6 @@ export default function ExaminerSignupPage() {
                   className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 flex-shrink-0"
                   checked={smsConsent}
                   onChange={e => setSmsConsent(e.target.checked)}
-                  required
                 />
                 <span className="text-sm text-gray-700">
                   I agree to receive recurring automated SMS job notifications from Phlobot at the phone number provided. Message frequency varies based on job availability in my area. Message and data rates may apply. Reply <strong>STOP</strong> to unsubscribe at any time, or <strong>HELP</strong> for help. View our{" "}
@@ -188,7 +203,11 @@ export default function ExaminerSignupPage() {
               </div>
             )}
 
-            <button type="submit" className="btn-primary w-full" disabled={loading || !smsConsent}>
+            <button
+              type="submit"
+              className="btn-primary w-full"
+              disabled={loading}
+            >
               {loading ? "Signing up…" : "Sign Me Up →"}
             </button>
           </form>
